@@ -55,7 +55,7 @@ class DataCleaner:
         return self.df
     
 
-    def convert_to_integer(self):
+    def convert_to_float(self):
         try:
             numeric_cols = ['current_price', 'price_change', 'high_price', 'low_price']
             self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Float64')
@@ -76,9 +76,6 @@ class DataCleaner:
         return self.df
 
 
-    
-
-
 
     def normalise_headers(self):
         try:
@@ -91,5 +88,31 @@ class DataCleaner:
         return self.df
     
 
-    
+    def save_changes(self, cleaned_data_path='./saved_data/saved_data.csv'):
+        import os
+        import pandas as pd
+        
+        try:
+            # Ensure directory exists
+            directory = os.path.dirname(cleaned_data_path)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+                logging.info(f"Created directory: {directory}")
 
+            # Check if file exists and has content
+            file_exists = os.path.exists(cleaned_data_path) and os.path.getsize(cleaned_data_path) > 0
+            
+            # Save with conditional header
+            self.df.to_csv(
+                cleaned_data_path,
+                mode='a',          # Append mode
+                index=False,       # No index column
+                header=not file_exists,  # Write header only if file doesn't exist or is empty
+                encoding='utf-8'    # Explicit encoding
+            )
+            logging.info(f"Data saved successfully. Header written: {not file_exists}")
+            
+        except Exception as e:
+            logging.error(f"Failed to save data: {e}")
+            raise  # Re-raise exception after logging
+        return self.df

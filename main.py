@@ -1,4 +1,4 @@
-from extraction.binanceData import DataExtraction
+from extraction.dataExtraction import DataExtraction
 from transformation.dataConvert import DataConvert
 from transformation.dataCleaner import DataCleaner
 
@@ -31,14 +31,17 @@ if __name__ == "__main__":
         cleaner.remove_duplicates()
         
         cleaner.check_string_types()
-        cleaner.convert_to_integer()
+        cleaner.convert_to_float()
         cleaner.convert_to_datetime()
 
         cleaner.normalise_headers()
 
+
+        cleaner.save_changes()
+
         
 
-        print(cleaner.normalise_headers())
+        # print(cleaner.normalise_headers())
         
 
 

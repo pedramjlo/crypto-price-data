@@ -2,6 +2,7 @@ import requests
 import logging
 from datetime import datetime, time
 import pytz
+from retry import retry
 
 
 logging.basicConfig(
@@ -60,32 +61,54 @@ class DataExtraction:
         except Exception as e:
             logging.error(f'Failed to retrieve exhange information, {e}')
 
-    ######################################
 
+    @retry(tries=5, delay=1, backoff=2, exceptions=(ConnectionResetError, requests.exceptions.RequestException))
     def daily_crypto_price(self, cryptos):
         """
-        Retrieve daily price info for a list of cryptocurrencies
-        
+        Retrieve daily price info for a list of cryptocurrencies with robust error handling
         """
-        results = []  # Store results for multiple cryptos
+        results = []
 
         for crypto in cryptos:
-            params = {'symbol': crypto}  # Update symbol for each request
+            params = {'symbol': crypto}
             try:
                 response = requests.get(self.daily_price_url, params=params)
-                response.raise_for_status()
-                logging.info(f'Successfully retrieved data for {crypto}')
-                data = response.json()
-                results.append({
-                    "crypto": data["symbol"],
-                    "current_price": data["lastPrice"],
-                    "price_change": data["priceChangePercent"],
-                    "high_price": data["highPrice"],
-                    "low_price": data["lowPrice"],
-                    "date": f"{self.get_eastern_time()}"
-                })
+                
+                # Check if response contains valid JSON data
+                try:
+                    data = response.json()
+                except ValueError:
+                    logging.error(f'Invalid JSON response for {crypto}')
+                    continue
+                    
+                # Validate required fields exist in response
+                required_fields = ['symbol', 'lastPrice', 'priceChangePercent', 
+                                'highPrice', 'lowPrice']
+                if not all(field in data for field in required_fields):
+                    logging.error(f'Missing required fields in response for {crypto}')
+                    continue
+                # Validate numeric fields are actually numbers
+                try:
+                    price_data = {
+                        "crypto": str(data["symbol"]),
+                        "current_price": float(data["lastPrice"]),
+                        "price_change": float(data["priceChangePercent"]),
+                        "high_price": float(data["highPrice"]),
+                        "low_price": float(data["lowPrice"]),
+                        "date": f"{self.get_eastern_time()}"
+                    }
+                    results.append(price_data)
+                    logging.info(f'Successfully retrieved valid data for {crypto}')
+                    
+                except (ValueError, TypeError) as e:
+                    logging.error(f'Invalid numeric data for {crypto}: {e}')
+                    continue
+                    
+            except requests.exceptions.RequestException as e:
+                logging.error(f'Request failed for {crypto}: {e}')
+                continue
             except Exception as e:
-                logging.error(f'Failed to retrieve price for {crypto}, {e}')
-                results.append({"crypto": crypto, "error": str(e)})  # Log errors for specific symbols
+                logging.error(f'Unexpected error for {crypto}: {e}')
+                continue
 
-        return results  # Return list of results
+        return results

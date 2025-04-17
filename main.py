@@ -29,6 +29,12 @@ if __name__ == "__main__":
         cleaner.sum_null_values()
         cleaner.imputate_null_values()
         cleaner.remove_duplicates()
+        
+        cleaner.check_string_types()
+        cleaner.convert_to_integer()
+        cleaner.convert_to_datetime()
+
+        cleaner.normalise_headers()
 
         
 

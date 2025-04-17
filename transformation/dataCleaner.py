@@ -43,6 +43,42 @@ class DataCleaner:
             logging.error(f"Failed to remove some duplicate values: {e}")
 
         return self.df
+    
+
+    def check_string_types(self):
+        try:
+            cols_to_convert = ['crypto']
+            self.df[cols_to_convert] = self.df[cols_to_convert].astype(str)
+            logging.info("Successfully converted specified columns to string type")
+        except Exception as e:
+            logging.error(f"Failed to convert some columns into strings: {e}")
+        return self.df
+    
+
+    def convert_to_integer(self):
+        try:
+            numeric_cols = ['current_price', 'price_change', 'high_price', 'low_price']
+            self.df[numeric_cols] = self.df[numeric_cols].apply(pd.to_numeric, errors='coerce').astype('Float64')
+            logging.info("Successfully converted specified columns to float type")
+        except Exception as e:
+            logging.error(f"Failed to convert some columns into float: {e}")
+        return self.df
+    
+
+    def convert_to_datetime(self):
+        try:
+            date_cols = ['date']
+            for col in date_cols:
+                self.df[col] = pd.to_datetime(self.df[col], errors='coerce')  # Converts invalid values to NaT
+            logging.info("Successfully converted specified columns to datetime type.")
+        except Exception as e:
+            logging.error(f"Failed to convert some columns into datetime: {e}")
+        return self.df
+
+
+    
+
+
 
     def normalise_headers(self):
         try:
@@ -51,4 +87,9 @@ class DataCleaner:
             logging.info("Successfully normalized column headers.")
         except Exception as e:
             logging.error(f"Failed to normalize column headers: {e}")
+        
         return self.df
+    
+
+    
+

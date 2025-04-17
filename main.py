@@ -1,17 +1,20 @@
 from extraction.binanceData import DataExtraction
 from transformation.convertToDataFrame import DataConvert
-from config.settings import BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_PRICE_URL
+
+
+from config.settings import BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_PRICE_URL # all the url endpoints
+
+
 if __name__ == "__main__":
 
-    # Step 1: Extraction
+    # Extraction
     extractor = DataExtraction(BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_PRICE_URL)
     data = extractor.daily_crypto_price(crypto='BNBBTC')
 
-    # Step 2: Transformation
+    # Transformation
     if data:
-        transformer = DataConvert()
-        df = transformer.json_to_dataframe([data])  # Wrap single JSON in list
-        cleaned_df = transformer.clean_dataframe(df)
+        transformer = DataConvert(daily_price_info=data)
+        df = transformer.data_to_dataframe()  # Wrap single JSON in list
 
         # Step 3: Print or Save the Cleaned Data
-        print(cleaned_df)
+        print(df)

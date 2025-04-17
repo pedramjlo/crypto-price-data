@@ -67,25 +67,25 @@ class DataExtraction:
             'symbol': crypto
         }
         
-        if self.get_eastern_time == time(16, 0):
-            try:
-                response = requests.get(self.daily_price_url, params=params)
-                response.raise_for_status()
-                logging.info('Successfully connected to Binance')
-                data = response.json()
-                return {
-                    "current_price": data["lastPrice"],
-                    "price_change": data["priceChangePercent"],
-                    "high_price": data["highPrice"],
-                    "low_price": data["lowPrice"],
-                    "date": f"{self.get_eastern_time}"
-                }
-            except Exception as e:
-                logging.error(f'Failed to retrieve BITCOIN price, {e}')
-                return None
-        else:
-            logging.error("It is not 4PM in the Eastern time")
+        # if self.get_eastern_time == time(16, 0):
+        try:
+            response = requests.get(self.daily_price_url, params=params)
+            response.raise_for_status()
+            logging.info('Successfully connected to Binance')
+            data = response.json()
+            return {
+                "current_price": data["lastPrice"],
+                "price_change": data["priceChangePercent"],
+                "high_price": data["highPrice"],
+                "low_price": data["lowPrice"],
+                "date": f"{self.get_eastern_time}"
+            }
+        except Exception as e:
+            logging.error(f'Failed to retrieve BITCOIN price, {e}')
             return None
+        #else:
+         #   logging.error("It is not 4PM in the Eastern time")
+          #  return None
         
 
 

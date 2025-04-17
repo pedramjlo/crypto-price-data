@@ -29,6 +29,6 @@ if __name__ == "__main__":
         # print(cleaner.sum_null_values())
         # print(cleaner.imputate_null_values())
 
-        print(df.columns)
+        print(cleaner.remove_duplicates())
 
 

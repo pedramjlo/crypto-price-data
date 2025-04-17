@@ -32,3 +32,15 @@ class DataCleaner:
         except Exception as e:
             logging.error(f"Failed to imputate rows: {e}")
             return None
+        
+        
+    def remove_duplicates(self):
+        try:
+            logging.info(f"Number of rows before removing duplicates: {len(self.df)}")
+            # Remove duplicate rows based on all columns
+            self.df = self.df.drop_duplicates(keep='first')
+            logging.info(f"Number of rows after removing duplicates: {len(self.df)}")
+        except Exception as e:
+            logging.error(f"Failed to remove some duplicate values: {e}")
+
+        return self.df

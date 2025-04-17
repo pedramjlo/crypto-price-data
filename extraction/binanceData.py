@@ -31,8 +31,9 @@ class DataExtraction:
         try:
             ny_tz = pytz.timezone('America/New_York')
             current_time_ny = datetime.now(ny_tz)
+            formatted_datetime = current_time_ny.strftime("%Y-%m-%d %H:%M:%S")
             logging.info('The Eastern time received')
-            return current_time_ny.time()
+            return formatted_datetime
         except Exception as e:
             logging.error(f'Failed to get the Eastern time, {e}')
 
@@ -61,31 +62,30 @@ class DataExtraction:
 
     ######################################
 
-    def daily_crypto_price(self, crypto):
-
-        params = {
-            'symbol': crypto
-        }
+    def daily_crypto_price(self, cryptos):
+        """
+        Retrieve daily price info for a list of cryptocurrencies
         
-        # if self.get_eastern_time == time(16, 0):
-        try:
-            response = requests.get(self.daily_price_url, params=params)
-            response.raise_for_status()
-            logging.info('Successfully connected to Binance')
-            data = response.json()
-            return {
-                "current_price": data["lastPrice"],
-                "price_change": data["priceChangePercent"],
-                "high_price": data["highPrice"],
-                "low_price": data["lowPrice"],
-                "date": f"{self.get_eastern_time}"
-            }
-        except Exception as e:
-            logging.error(f'Failed to retrieve BITCOIN price, {e}')
-            return None
-        #else:
-         #   logging.error("It is not 4PM in the Eastern time")
-          #  return None
-        
+        """
+        results = []  # Store results for multiple cryptos
 
+        for crypto in cryptos:
+            params = {'symbol': crypto}  # Update symbol for each request
+            try:
+                response = requests.get(self.daily_price_url, params=params)
+                response.raise_for_status()
+                logging.info(f'Successfully retrieved data for {crypto}')
+                data = response.json()
+                results.append({
+                    "crypto": data["symbol"],
+                    "current_price": data["lastPrice"],
+                    "price_change": data["priceChangePercent"],
+                    "high_price": data["highPrice"],
+                    "low_price": data["lowPrice"],
+                    "date": f"{self.get_eastern_time()}"
+                })
+            except Exception as e:
+                logging.error(f'Failed to retrieve price for {crypto}, {e}')
+                results.append({"crypto": crypto, "error": str(e)})  # Log errors for specific symbols
 
+        return results  # Return list of results

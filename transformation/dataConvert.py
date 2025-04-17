@@ -11,7 +11,7 @@ logging.basicConfig(
 
 
 
-class DataConvert:
+class DataTranformation:
     def __init__(self, daily_price_info):
         self.daily_price_info = daily_price_info
 

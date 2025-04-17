@@ -1,6 +1,6 @@
 import requests
 import logging
-from datetime import datetime
+from datetime import datetime, time
 import pytz
 
 
@@ -22,6 +22,7 @@ class DataExtraction:
         self.data_params = data_params
 
 
+
     def get_eastern_time(self):
         """ 
         - checking if currently the time in Eastern time is 4PM (the market's closing time)
@@ -33,7 +34,6 @@ class DataExtraction:
             return current_time_ny.time()
         except Exception as e:
             logging.error(f'Failed to get the Eastern time, {e}')
-
 
 
 
@@ -58,40 +58,15 @@ class DataExtraction:
         except Exception as e:
             logging.error(f'Failed to retrieve exhange information, {e}')
 
-
-
-    def daily_crypto_price(self, crypto):
-        request_time = datetime.now()
-
-        params = {
-            'symbol': crypto
-        }
-        try:
-            response = requests.get(self.daily_price_url, params=params)
-            response.raise_for_status()
-            logging.info("Successfully connected to Binance")
-            data = response.json()
-            return {
-                "current_price": data["lastPrice"],
-                "price_change": data["priceChangePercent"],
-                "high_price": data["highPrice"],
-                "low_price": data["lowPrice"],
-                "date": f"{request_time}"
-            }
-        except Exception as e:
-            logging.error(f"Failed to retrieve the crypto price, {e}")
-        
-
     ######################################
 
     def daily_crypto_price(self, crypto):
-        request_time = datetime.now()
 
         params = {
             'symbol': crypto
         }
         
-        if request_time == self.get_us_market_close_time:
+        if self.get_eastern_time == time(16, 0):
             try:
                 response = requests.get(self.daily_price_url, params=params)
                 response.raise_for_status()
@@ -102,12 +77,14 @@ class DataExtraction:
                     "price_change": data["priceChangePercent"],
                     "high_price": data["highPrice"],
                     "low_price": data["lowPrice"],
-                    "date": f"{request_time}"
+                    "date": f"{self.get_eastern_time}"
                 }
             except Exception as e:
                 logging.error(f'Failed to retrieve BITCOIN price, {e}')
+                return None
         else:
-            logging.error("")
+            logging.error("It is not 4PM in the Eastern time")
+            return None
         
 
 
@@ -128,6 +105,6 @@ if __name__ == "__main__":
     # print(extractor.exchange_information())
 
 
-    # print(extractor.daily_crypto_price(crypto='BNBETH'))
+    print(extractor.daily_crypto_price(crypto='BNBBTC'))
 
-    print(extractor.get_eastern_time())
+    # print(extractor.get_eastern_time())

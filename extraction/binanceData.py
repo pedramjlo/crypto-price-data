@@ -25,6 +25,7 @@ class DataExtraction:
 
     def get_eastern_time(self):
         """ 
+        - this function is to check strictly if the requests are specifically are sent at 4PM the ET
         - checking if currently the time in Eastern time is 4PM (the market's closing time)
         """
         try:
@@ -88,23 +89,3 @@ class DataExtraction:
         
 
 
-if __name__ == "__main__":
-
-    binance_test_url = 'https://api.binance.com/api/v3/ping'
-
-    exchange_info_url = 'https://api.binance.com/api/v3/exchangeInfo'
-
-    daily_price_url = 'https://api.binance.com/api/v3/ticker/24hr'
-
-    extractor = DataExtraction(binance_test_url, exchange_info_url, daily_price_url)
-
-
-
-    print(extractor.test_connection())
-
-    # print(extractor.exchange_information())
-
-
-    print(extractor.daily_crypto_price(crypto='BNBBTC'))
-
-    # print(extractor.get_eastern_time())

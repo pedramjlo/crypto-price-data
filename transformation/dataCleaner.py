@@ -27,7 +27,6 @@ class DataCleaner:
         try:
             self.df.fillna(method='ffill', inplace=True)  
             logging.info("Successfully imputated rows")
-            return self.df
         
         except Exception as e:
             logging.error(f"Failed to imputate rows: {e}")
@@ -43,4 +42,13 @@ class DataCleaner:
         except Exception as e:
             logging.error(f"Failed to remove some duplicate values: {e}")
 
+        return self.df
+
+    def normalise_headers(self):
+        try:
+            self.df.columns = ['_'.join(word.title() for word in column.split("_")) for column in self.df.columns]
+            self.df = self.df.reset_index(drop=True)
+            logging.info("Successfully normalized column headers.")
+        except Exception as e:
+            logging.error(f"Failed to normalize column headers: {e}")
         return self.df

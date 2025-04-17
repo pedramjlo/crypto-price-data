@@ -19,9 +19,11 @@ class DataConvert:
     def data_to_dataframe(self):
         try:
             df = pd.DataFrame(self.daily_price_info)
+    
             logging.info("Successfully converted JSON data to Pandas DataFrame.")
             return df
         except Exception as e:
             logging.error(f"Failed to convert JSON data to Pandas DataFrame: {e}")
             return None
+
 

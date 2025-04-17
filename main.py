@@ -26,9 +26,13 @@ if __name__ == "__main__":
     # Cleaning
     if df is not None:
         cleaner = DataCleaner(df=df)
-        # print(cleaner.sum_null_values())
-        # print(cleaner.imputate_null_values())
+        cleaner.sum_null_values()
+        cleaner.imputate_null_values()
+        cleaner.remove_duplicates()
 
-        print(cleaner.remove_duplicates())
+        
+
+        print(cleaner.normalise_headers())
+        
 
 

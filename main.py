@@ -1,8 +1,9 @@
 from extraction.binanceData import DataExtraction
-from transformation.dataConvert import DataTranformation
+from transformation.dataConvert import DataConvert
+from transformation.dataCleaner import DataCleaner
 
 
-from config.settings import BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_PRICE_URL # all the url endpoints
+from config.settings import BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_TEST_URL # all the url endpoints
 
 
 if __name__ == "__main__":
@@ -13,10 +14,21 @@ if __name__ == "__main__":
     cryptos = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]
     data = extractor.daily_crypto_price(cryptos=cryptos)
 
-    # Transformation
+    # Convert To DataFrame
     if data:
-        transformer = DataTranformation(daily_price_info=data)
+        transformer = DataConvert(daily_price_info=data)
         df = transformer.data_to_dataframe()  # Wrap single JSON in list
 
         # Step 3: Print or Save the Cleaned Data
-        print(df)
+        # print(df)
+
+    
+    # Cleaning
+    if df is not None:
+        cleaner = DataCleaner(df=df)
+        # print(cleaner.sum_null_values())
+        # print(cleaner.imputate_null_values())
+
+        print(df.columns)
+
+

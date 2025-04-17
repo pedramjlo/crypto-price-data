@@ -11,14 +11,14 @@ logging.basicConfig(
 
 
 
-class DataTranformation:
+class DataConvert:
     def __init__(self, daily_price_info):
         self.daily_price_info = daily_price_info
 
 
     def data_to_dataframe(self):
         try:
-            df = pd.DataFrame([self.daily_price_info])
+            df = pd.DataFrame(self.daily_price_info)
             logging.info("Successfully converted JSON data to Pandas DataFrame.")
             return df
         except Exception as e:

@@ -15,17 +15,12 @@ class DataConvert:
     def __init__(self, daily_price_info):
         self.daily_price_info = daily_price_info
 
-
     def data_to_dataframe(self):
+        """Convert JSON data to a Pandas DataFrame."""
         try:
             df = pd.DataFrame(self.daily_price_info)
-    
             logging.info("Successfully converted JSON data to Pandas DataFrame.")
             return df
         except Exception as e:
             logging.error(f"Failed to convert JSON data to Pandas DataFrame: {e}")
             return None
-
-
-
-

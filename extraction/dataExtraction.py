@@ -80,55 +80,56 @@ class DataExtraction:
     @retry(tries=5, delay=1, backoff=2, exceptions=(ConnectionResetError, requests.exceptions.RequestException))
     def daily_crypto_price(self, cryptos, interval, start_time, end_time):
         """
-        Retrieve daily price info for a list of cryptocurrencies with robust error handling
+        Retrieve daily price information for a list of cryptocurrencies with candlestick data.
         """
         results = []
-
         for crypto in cryptos:
-            params = {'symbol': crypto, 
-                      'interval': interval, 
-                      'startTime': self.convert_date_to_miliseconds(start_time), 
-                      'endTime': self.convert_date_to_miliseconds(end_time)
+            params = {
+                'symbol': crypto,
+                'interval': interval,
+                'startTime': self.convert_date_to_miliseconds(start_time),
+                'endTime': self.convert_date_to_miliseconds(end_time)
             }
             try:
                 response = requests.get(self.daily_price_url, params=params)
-                
-                # Check if response contains valid JSON data
-                try:
-                    data = response.json()
-                except ValueError:
-                    logging.error(f'Invalid JSON response for {crypto}')
+                response.raise_for_status()
+
+                # Check response type
+                if 'application/json' not in response.headers.get('Content-Type', ''):
+                    logging.error(f"Unexpected content type in response for {crypto}")
                     continue
-                    
-                # Validate required fields exist in response
-                required_fields = ['symbol', 'lastPrice', 'priceChangePercent', 
-                                'highPrice', 'lowPrice', 'interval', 'startTime', 'endTime']
-                required_indices = [1, 2, 3, 4, 5]
-                if not all(isinstance(data[0][i], (int, float, str)) for i in required_indices):
-                    logging.error(f'Missing required fields in response for {crypto}')
+
+                # Parse JSON response
+                data = response.json()
+
+                # Ensure response is a list of candlestick data
+                if not isinstance(data, list) or len(data) == 0:
+                    logging.error(f"Invalid candlestick data format for {crypto}")
                     continue
-                # Validate numeric fields are actually numbers
-                try:
-                    price_data = {
-                        "crypto": str(data["symbol"]),
-                        "current_price": float(data["lastPrice"]),
-                        "price_change": float(data["priceChangePercent"]),
-                        "high_price": float(data["highPrice"]),
-                        "low_price": float(data["lowPrice"]),
-                        "date": f"{self.get_eastern_time()}"
-                    }
-                    results.append(price_data)
-                    logging.info(f'Successfully retrieved valid data for {crypto}')
-                    
-                except (ValueError, TypeError) as e:
-                    logging.error(f'Invalid numeric data for {crypto}: {e}')
-                    continue
-                    
+
+                # Extract required candlestick fields
+                for candle in data:
+                    try:
+                        price_data = {
+                            "crypto": crypto,
+                            "open_price": float(candle[1]),
+                            "high_price": float(candle[2]),
+                            "low_price": float(candle[3]),
+                            "close_price": float(candle[4]),
+                            "volume": float(candle[5]),
+                            "timestamp": int(candle[0])
+                        }
+                        results.append(price_data)
+                        logging.info(f"Successfully retrieved data for {crypto}: {price_data}")
+                    except (ValueError, IndexError) as e:
+                        logging.error(f"Failed to parse candlestick data for {crypto}: {e}")
+                        continue
+
             except requests.exceptions.RequestException as e:
-                logging.error(f'Request failed for {crypto}: {e}')
+                logging.error(f"Request failed for {crypto}: {e}")
                 continue
             except Exception as e:
-                logging.error(f'Unexpected error for {crypto}: {e}')
+                logging.error(f"Unexpected error for {crypto}: {e}")
                 continue
 
         return results

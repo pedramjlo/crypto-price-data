@@ -14,4 +14,5 @@ df = pd.read_csv('../saved_data/saved_data.csv')
 engine = create_engine(f"postgresql://{user}:{password}@localhost/{dbname}")
 df.to_sql('crypto_data', engine, if_exists='append', index=False)
 
+print(2)
 

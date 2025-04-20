@@ -62,15 +62,34 @@ class DataExtraction:
             logging.error(f'Failed to retrieve exhange information, {e}')
 
 
+    def convert_date_to_miliseconds(self, date):
+        from datetime import datetime
+        try:
+            """
+            These timestamps are represented in milliseconds since the Unix epoch (January 1, 1970). 
+            This is a widely-used format known as Unix time or epoch time.
+            """
+            date_in_miliseconds = int(datetime.strptime(date, "%Y-%m-%d %H:%M:%S").timestamp() * 1000)
+            logging.info("Successfully convert date to UNIX")
+            return date_in_miliseconds
+        except Exception as e:
+            logging.error(f'Failed to convert date to UNIX (miliseconds) format, {e}')
+
+
+
     @retry(tries=5, delay=1, backoff=2, exceptions=(ConnectionResetError, requests.exceptions.RequestException))
-    def daily_crypto_price(self, cryptos):
+    def daily_crypto_price(self, cryptos, interval, start_time, end_time):
         """
         Retrieve daily price info for a list of cryptocurrencies with robust error handling
         """
         results = []
 
         for crypto in cryptos:
-            params = {'symbol': crypto}
+            params = {'symbol': crypto, 
+                      'interval': interval, 
+                      'startTime': self.convert_date_to_miliseconds(start_time), 
+                      'endTime': self.convert_date_to_miliseconds(end_time)
+            }
             try:
                 response = requests.get(self.daily_price_url, params=params)
                 
@@ -83,8 +102,9 @@ class DataExtraction:
                     
                 # Validate required fields exist in response
                 required_fields = ['symbol', 'lastPrice', 'priceChangePercent', 
-                                'highPrice', 'lowPrice']
-                if not all(field in data for field in required_fields):
+                                'highPrice', 'lowPrice', 'interval', 'startTime', 'endTime']
+                required_indices = [1, 2, 3, 4, 5]
+                if not all(isinstance(data[0][i], (int, float, str)) for i in required_indices):
                     logging.error(f'Missing required fields in response for {crypto}')
                     continue
                 # Validate numeric fields are actually numbers

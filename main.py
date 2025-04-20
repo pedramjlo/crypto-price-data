@@ -12,7 +12,11 @@ if __name__ == "__main__":
     extractor = DataExtraction(BINANCE_PRICE_URL, BINANCE_INFO_URL, BINANCE_PRICE_URL)
     
     cryptos = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]
-    data = extractor.daily_crypto_price(cryptos=cryptos)
+    data = extractor.daily_crypto_price(cryptos=cryptos, interval='1d', start_time='2020-01-01 07:00:00', end_time='2023-01-01 16:00:00')
+
+
+    global df
+    df = None
 
     # Convert To DataFrame
     if data:

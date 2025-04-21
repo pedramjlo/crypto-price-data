@@ -13,7 +13,6 @@ logging.basicConfig(
 
 
 
-
 class DataExtraction:
 
     def __init__(self, binance_test_url, exchange_info_url, daily_price_url, data_params=None):
@@ -59,7 +58,7 @@ class DataExtraction:
             logging.info('Retrieved exchange inforamtion successfully')
             return response.json()
         except Exception as e:
-            logging.error(f'Failed to retrieve exhange information, {e}')
+            logging.error(f'Failed to retrieve exchange information, {e}')
 
 
     def convert_date_to_miliseconds(self, date):

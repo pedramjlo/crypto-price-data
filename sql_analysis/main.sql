@@ -1,4 +1,4 @@
-SELECT * FROM crypto_data;
+SELECT * FROM crypto_data_table;
 
 
 SELECT "Crypto", MAX("Price_Change") as "Highest_Price_Change"

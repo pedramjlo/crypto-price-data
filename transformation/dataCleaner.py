@@ -16,7 +16,6 @@ class DataCleaner:
     def sum_null_values(self):
         """Count the number of null values in each column."""
         try:
-            logging.info("Calculating the number of null values per column.")
             return self.df.isnull().sum()
         except Exception as e:
             logging.error(f"Failed to calculate null values: {e}")

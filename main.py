@@ -52,6 +52,10 @@ if __name__ == "__main__":
         data=data
         )
 
+    # CLEANER
+    cleaner = DataCleaner(df=df)
+    print(cleaner.sum_null_values())
+
     
         
 

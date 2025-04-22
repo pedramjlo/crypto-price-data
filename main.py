@@ -56,7 +56,7 @@ if __name__ == "__main__":
     cleaner = DataCleaner(df=df)
     null_value_sum = cleaner.sum_null_values()
     imputate_null_values = cleaner.imputate_null_values()
-    
+    remove_duplciates = cleaner.remove_duplicates()
 
 
     

@@ -1,9 +1,10 @@
+import os
+import csv
+import logging 
+import pandas as pd 
 import requests
-import logging
-from datetime import datetime, time
-import pytz
-from retry import retry
 
+from datetime import datetime
 
 logging.basicConfig(
     level=logging.INFO,  # Set the minimum log level
@@ -13,50 +14,31 @@ logging.basicConfig(
 
 
 
-class DataExtraction:
-
-    def __init__(self, binance_test_url, exchange_info_url, daily_price_url, data_params=None):
-        self.binance_test_url = binance_test_url
-        self.exchange_info_url = exchange_info_url
-        self.daily_price_url = daily_price_url
-        self.data_params = data_params
+class BinanceDataExtraction:
+    def __init__(self, connection_test_endpoint, binance_prices_endpoint):
+        self.binance_prices_endpoint = binance_prices_endpoint
+        self.connection_test_endpoint = connection_test_endpoint
 
 
 
-    def get_eastern_time(self):
-        """ 
-        - this function is to check strictly if the requests are specifically are sent at 4PM the ET
-        - checking if currently the time in Eastern time is 4PM (the market's closing time)
-        """
-        try:
-            ny_tz = pytz.timezone('America/New_York')
-            current_time_ny = datetime.now(ny_tz)
-            formatted_datetime = current_time_ny.strftime("%Y-%m-%d %H:%M:%S")
-            logging.info('The Eastern time received')
-            return formatted_datetime
-        except Exception as e:
-            logging.error(f'Failed to get the Eastern time, {e}')
-
-
-
+        
 
     def test_connection(self):
         try:
-            response = requests.get(self.binance_test_url, params=self.data_params)
+            response = requests.get(self.connection_test_endpoint)
             response.raise_for_status()  
-            logging.info('Successfully connected to Binance')
-            return response.json()
+            logging.info(f'Successfully connected to Binance, {response.status_code}')
+            return response.status_code
         except Exception as e:
             logging.error(f'Failed to connect to Binance, {e}')
 
 
-
-    def exchange_information(self):
+    def exchange_information(self, exchange_info_url):
         try:
-            response = requests.get(self.exchange_info_url, params=self.data_params)
+            response = requests.get(exchange_info_url)
             response.raise_for_status()  
             logging.info('Retrieved exchange inforamtion successfully')
-            return response.json()
+            return response.status_code
         except Exception as e:
             logging.error(f'Failed to retrieve exchange information, {e}')
 
@@ -75,38 +57,37 @@ class DataExtraction:
             logging.error(f'Failed to convert date to UNIX (miliseconds) format, {e}')
 
 
+    
 
-    @retry(tries=5, delay=1, backoff=2, exceptions=(ConnectionResetError, requests.exceptions.RequestException))
-    def daily_crypto_price(self, cryptos, interval, start_time, end_time):
-        """
-        Retrieve daily price information for a list of cryptocurrencies with candlestick data.
-        """
+
+
+    def get_binance_data(self, binance_price_endpoint, cryptos, start_time, end_time, interval):
         results = []
         for crypto in cryptos:
             params = {
-                'symbol': crypto,
-                'interval': interval,
-                'startTime': self.convert_date_to_miliseconds(start_time),
-                'endTime': self.convert_date_to_miliseconds(end_time)
+                "symbol": crypto,
+                "interval": interval,
+                "startTime": self.convert_date_to_miliseconds(start_time),
+                "endTime": self.convert_date_to_miliseconds(end_time),
             }
+            
             try:
-                response = requests.get(self.daily_price_url, params=params)
+                response = requests.get(binance_price_endpoint, params=params)
                 response.raise_for_status()
 
-                # Check response type
+                # Validate content type
                 if 'application/json' not in response.headers.get('Content-Type', ''):
-                    logging.error(f"Unexpected content type in response for {crypto}")
+                    logging.error(f"Unexpected content type for {crypto}")
                     continue
 
-                # Parse JSON response
                 data = response.json()
 
-                # Ensure response is a list of candlestick data
+                # Ensure valid response
                 if not isinstance(data, list) or len(data) == 0:
-                    logging.error(f"Invalid candlestick data format for {crypto}")
+                    logging.error(f"Invalid response for {crypto}")
                     continue
 
-                # Extract required candlestick fields
+                # Extract candlestick data
                 for candle in data:
                     try:
                         price_data = {
@@ -116,19 +97,36 @@ class DataExtraction:
                             "low_price": float(candle[3]),
                             "close_price": float(candle[4]),
                             "volume": float(candle[5]),
-                            "timestamp": int(candle[0])
+                            "timestamp": datetime.fromtimestamp(candle[0] / 1000).strftime('%Y-%m-%d %H:%M:%S')
                         }
                         results.append(price_data)
-                        logging.info(f"Successfully retrieved data for {crypto}: {price_data}")
+                        logging.info(f"Extracted data: {price_data}")
                     except (ValueError, IndexError) as e:
-                        logging.error(f"Failed to parse candlestick data for {crypto}: {e}")
+                        logging.error(f"Error processing candle data for {crypto}: {e}")
                         continue
 
             except requests.exceptions.RequestException as e:
                 logging.error(f"Request failed for {crypto}: {e}")
-                continue
             except Exception as e:
                 logging.error(f"Unexpected error for {crypto}: {e}")
-                continue
 
         return results
+    
+
+    
+    def save_data_to_csv(self, csv_file_path, fieldnames, data):
+        try:
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(csv_file_path), exist_ok=True)
+            
+            # Write to CSV
+            file_exists = os.path.isfile(csv_file_path)
+            with open(csv_file_path, 'a', newline='', encoding='utf-8') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+                if not file_exists:
+                    writer.writeheader()
+                writer.writerows(data)  # Use writerows for bulk write
+            logging.info(f"Data saved to {csv_file_path}")
+        except Exception as e:
+            logging.error(f"CSV save failed: {e}")
+            raise

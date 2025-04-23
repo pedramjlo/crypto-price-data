@@ -75,7 +75,7 @@ class DataCleaner:
         try:
             self.df.columns = ['_'.join(word.title() for word in column.split("_")) for column in self.df.columns]
             self.df = self.df.reset_index(drop=True)
-            logging.info("Successfully normalized column headers.")
+            logging.info(f"Successfully normalized column headers. New headers: {[h for h in self.df.columns[:3]]} and etc.")
         except Exception as e:
             logging.error(f"Failed to normalize headers: {e}")
 

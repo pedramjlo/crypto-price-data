@@ -62,8 +62,8 @@ if __name__ == "__main__":
     check_string_values = cleaner.check_string_types()
     check_float_values = cleaner.convert_to_float()
     check_datetime_values = cleaner.convert_to_datetime()
-    # check_datetime_values = cleaner.convert_to_datetime()
-    # normalise_headers
+    normalise_headers = cleaner.normalise_headers()
+    
 
 
 

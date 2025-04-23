@@ -2,7 +2,9 @@ import os
 import logging
 
 from extraction.dataExtraction import BinanceDataExtraction
+from extraction.getNews import GetNews
 from transformation.dataCleaner import DataCleaner
+
 from loading.loadToDB import load_csv_to_postgres
 
 import pandas as pd
@@ -23,7 +25,7 @@ if __name__ == "__main__":
     CSV_PATH = os.path.join("loading/saved_data", "binance_data.csv")
     table_name = "crypto_data"
     cryptos = ["BTCUSDT", "ETHUSDT"]
-    interval = "1m"
+    interval = "1y"
     start_time = "2020-01-01 00:00:00"
     end_time = "2025-04-01 00:00:00"
 
@@ -68,6 +70,17 @@ if __name__ == "__main__":
 
     # LOAD CSV INTO POSTGRES & UPDATE THE DATABASE
     load_csv_to_postgres()
+
+
+    # GET NEWS
+    keywords = [
+        'Iran',
+        'Israel'
+        'Oil'
+        'Stock market'
+    ]
+    api_news_endpoint = "https://content.guardianapis.com/search"
+    section = 'Finance'
 
     
 

@@ -2,8 +2,8 @@ import os
 import logging
 
 from extraction.dataExtraction import BinanceDataExtraction
-from transformation.dataConvert import DataConvert
 from transformation.dataCleaner import DataCleaner
+from loading.loadToDB import load_csv_to_postgres
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     CSV_PATH = os.path.join("loading/saved_data", "binance_data.csv")
     table_name = "crypto_data"
     cryptos = ["BTCUSDT", "ETHUSDT"]
-    interval = "1d"
+    interval = "1m"
     start_time = "2020-01-01 00:00:00"
     end_time = "2025-04-01 00:00:00"
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         csv_file_path=CSV_PATH,
         fieldnames=df.columns.tolist(),
         data=data
-        )
+    )
 
     # CLEANER
     cleaner = DataCleaner(df=df)
@@ -66,7 +66,8 @@ if __name__ == "__main__":
 
     cleaner.save_changes()
 
-
+    # LOAD CSV INTO POSTGRES & UPDATE THE DATABASE
+    load_csv_to_postgres()
 
     
 

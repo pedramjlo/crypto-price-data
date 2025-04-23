@@ -121,7 +121,7 @@ class BinanceDataExtraction:
             
             # Write to CSV
             file_exists = os.path.isfile(csv_file_path)
-            with open(csv_file_path, 'a', newline='', encoding='utf-8') as csv_file:
+            with open(csv_file_path, 'w', newline='', encoding='utf-8') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
                 if not file_exists:
                     writer.writeheader()

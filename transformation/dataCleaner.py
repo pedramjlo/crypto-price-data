@@ -79,17 +79,19 @@ class DataCleaner:
         except Exception as e:
             logging.error(f"Failed to normalize headers: {e}")
 
+
     def save_changes(self, cleaned_data_path='./saved_data/saved_data.csv'):
-        """Save the cleaned data to a CSV file."""
-        import os
+        """
+        Save the cleaned data to the same CSV file. Creates the file if it doesn't exist.
+        """
         try:
-            directory = os.path.dirname(cleaned_data_path)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-                logging.info(f"Created directory: {directory}")
+            import os
             
-            file_exists = os.path.exists(cleaned_data_path) and os.path.getsize(cleaned_data_path) > 0
-            self.df.to_csv(cleaned_data_path, mode='a', index=False, header=not file_exists, encoding='utf-8')
-            logging.info(f"Data saved successfully to {cleaned_data_path}. Header written: {not file_exists}")
+            # Ensure the directory exists
+            os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)
+
+            # Save DataFrame to CSV
+            self.df.to_csv(cleaned_data_path, index=False, encoding='utf-8')
+            logging.info(f"Successfully saved cleaned data to {cleaned_data_path}.")
         except Exception as e:
-            logging.error(f"Failed to save data: {e}")
+            logging.error(f"Failed to save the cleaned data: {e}")

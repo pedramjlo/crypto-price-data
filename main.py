@@ -55,15 +55,20 @@ if __name__ == "__main__":
     # CLEANER
     cleaner = DataCleaner(df=df)
 
-    null_value_sum = cleaner.sum_null_values()
-    imputate_null_values = cleaner.imputate_null_values()
-    remove_duplciates = cleaner.remove_duplicates()
+    cleaner.sum_null_values()
+    cleaner.imputate_null_values()
+    cleaner.remove_duplicates()
 
-    check_string_values = cleaner.check_string_types()
-    check_float_values = cleaner.convert_to_float()
-    check_datetime_values = cleaner.convert_to_datetime()
-    normalise_headers = cleaner.normalise_headers()
+    cleaner.check_string_types()
+    cleaner.convert_to_float()
+    cleaner.convert_to_datetime()
+    cleaner.normalise_headers()
+
+    cleaner.save_changes()
+
+
     
+
 
 
 

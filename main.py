@@ -20,7 +20,7 @@ from config.settings import BINANCE_PRICE_URL, BINANCE_TEST_URL, BINANCE_PRICE_U
 if __name__ == "__main__":
 
     # Extraction
-    CSV_PATH = os.path.join("saved_data", "binance_data.csv")
+    CSV_PATH = os.path.join("loading/saved_data", "binance_data.csv")
     table_name = "crypto_data"
     cryptos = ["BTCUSDT", "ETHUSDT"]
     interval = "1d"
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     cleaner.save_changes()
 
 
-    
 
+    
 
 
 

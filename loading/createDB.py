@@ -12,11 +12,11 @@ try:
     password = os.getenv('DB_PASS')
     host = 'localhost'
     port = 5432
-    dbname = 'crypto_data'  # The name of the database you want to create
+    dbname = 'crypto_data' 
 
-    # Connect to the default 'postgres' database
+    # Establish a connection to the DB
     conn = psycopg2.connect(dbname='postgres', user=user, password=password, host=host, port=port)
-    conn.autocommit = True  # Enable autocommit to allow database creation
+    conn.autocommit = True  # To allow database creation
     cur = conn.cursor()
 
     # Check if the database already exists
@@ -24,7 +24,7 @@ try:
     exists = cur.fetchone()
 
     if not exists:
-        # Create the database if it doesn't exist
+        # Create the database if not  exists
         cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(dbname)))
         print(f"Database '{dbname}' created successfully.")
     else:

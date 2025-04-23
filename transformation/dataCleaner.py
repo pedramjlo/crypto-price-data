@@ -52,7 +52,7 @@ class DataCleaner:
     def convert_to_float(self):
         """Convert numeric columns to float type."""
         try:
-            numeric_cols = ['current_price', 'price_change', 'high_price', 'low_price']
+            numeric_cols = ['current_price', 'price_change', 'high_price', 'low_price', 'volume']
             existing_cols = [col for col in numeric_cols if col in self.df.columns]
             self.df[existing_cols] = self.df[existing_cols].apply(pd.to_numeric, errors='coerce').astype('Float64')
             logging.info("Successfully converted numeric columns to float type.")
@@ -62,7 +62,7 @@ class DataCleaner:
     def convert_to_datetime(self):
         """Convert date columns to datetime."""
         try:
-            date_cols = ['date']
+            date_cols = ['timestamp']
             for col in date_cols:
                 if col in self.df.columns:
                     self.df[col] = pd.to_datetime(self.df[col], errors='coerce')

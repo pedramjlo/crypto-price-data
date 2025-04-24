@@ -20,5 +20,5 @@ API app to extract crypto data from Binance.
   <li>Imputation of null values</li>
   <li>Removal of duplicate rows</li>
   <li>Check for string, float, and date datatypes</li>
-  <li>Save the cleaned in a new file</li>
+  <li>Save the cleaned dataset in a new file</li>
 </u;>

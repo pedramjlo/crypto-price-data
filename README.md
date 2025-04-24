@@ -13,12 +13,11 @@ API app to extract crypto data from Binance.
 </ui>
 
 
-2- Transformation.DataCleaner class contains method to clean the extracted Binance data and saves the cleaned data into the binance_data.csv.
+2- Transformation.DataCleaner class contains method to clean the extracted Binance data and saves the cleaned data in the binance_data.csv.
 <ul>
   <li>Sum of null value rows</li>
   <li>Imputation of null values</li>
   <li>Removal of duplicate rows</li>
   <li>Check for string, float, and date datatypes</li>
-  <li>saved</li>
-  <li></li>
+  <li>Save the cleaned in a new file</li>
 </u;>

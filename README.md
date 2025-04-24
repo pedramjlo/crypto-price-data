@@ -3,9 +3,7 @@ API app to extract crypto data from Binance.
 
 # The Pipeline
 
-###Data Extraction
-<b>Extraction.BinanceDataExtraction</b> extracts crypto data from a Binance API endpoint
-along with paramters like
+1- Extraction.BinanceDataExtraction extracts crypto data from a Binance API endpoint along with paramters like
 <ui>
   <li>crypto</li>
   <li>starte date (unix epoch milliseconds)</li>

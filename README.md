@@ -3,7 +3,7 @@ API app to extract crypto data from Binance.
 
 # The Pipeline
 
-1- (Extraction.BinanceDataExtraction.convert_date_to_miliseconds) extracts crypto data from a Binance API endpoint along with paramters like
+1- Extraction.BinanceDataExtraction.get_binance_data() extracts crypto data from a Binance API endpoint along with some paramters and saves it into a saved_data.csv file;
 <ui>
   <li>crypto</li>
   <li>starte date (unix epoch milliseconds)</li>
@@ -13,4 +13,12 @@ API app to extract crypto data from Binance.
 </ui>
 
 
-2- 
+2- Transformation.DataCleaner class contains method to clean the extracted Binance data and saves the cleaned data into the binance_data.csv.
+<ul>
+  <li>Sum of null value rows</li>
+  <li>Imputation of null values</li>
+  <li>Removal of duplicate rows</li>
+  <li>Check for string, float, and date datatypes</li>
+  <li>saved</li>
+  <li></li>
+</u;>

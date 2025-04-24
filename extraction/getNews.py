@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import logging
 import requests
 
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -21,54 +22,62 @@ class GetNews:
         try:
             url = api_news_endpoint
 
-            # Define request parameters
             params = {
                 'api-key': self.api_key,
-                'text': ' OR '.join(keywords),  # Combine keywords into a single string
+                'text': ' OR '.join(keywords), 
                 'language': language,
                 'from-date': from_date,
                 'to-date': to_date,
-                'category': ','.join(category)  # Convert list to comma-separated values
+                'category': ','.join(category)  
             }
 
             logging.info(f"Requesting news with parameters: {params}")
 
-            # Make the API request
             response = requests.get(url, params=params)
             response.raise_for_status()
 
-            # Debugging: Inspect response
             logging.info(f"Response URL: {response.url}")
             logging.info(f"Response Status Code: {response.status_code}")
 
-            # Parse headlines from the response
             data = response.json()
-            logging.info(f"Response Data: {data}")  # Log full response for debugging
+            logging.info(f"Response Data: {data}") 
 
             articles = data.get('response', {}).get('results', [])
             if not articles:
                 logging.info("No articles found for the given criteria.")
                 return []
 
-            # Extract headlines
+
             headlines = [article.get('webTitle', 'N/A') for article in articles]
             for headline in headlines:
-                print(f"Headline: {headline}")
-
+                logging.ingo(f"Headline: {headline}")
             return headlines
 
         except requests.exceptions.RequestException as e:
             logging.error(f"Failed to fetch news: {e}")
             return []
 
+    def save_to_file(self, filename, headlines):
+        try:
+            with open(filename, 'w', encoding='utf-8') as file:
+                for headline in headlines:
+                    file.write(headline + '\n')
+            logging.info(f"Headlines successfully saved to {filename}")
+        except Exception as e:
+            logging.error(f"Failed to save headlines to file: {e}")
+
 # Example usage
 api_news_endpoint = "https://api.worldnewsapi.com/search-news"
-keywords = ['نفت']
-language = "fa"
+keywords = ['bitcoin', 'price', 'surge', 'boom', 'increase']
+language = "en"
 from_date = "2022-01-01"
 to_date = "2025-01-01"
 category = ['Politics']
 
 news = GetNews()
 headlines = news.fetch_news(api_news_endpoint, keywords, language, from_date, to_date, category)
-print(f"Total Headlines Found: {len(headlines)}")
+
+if headlines:
+    news.save_to_file('headlines.txt', headlines)
+
+

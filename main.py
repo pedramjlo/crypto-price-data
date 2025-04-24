@@ -79,8 +79,8 @@ if __name__ == "__main__":
         'Oil'
         'Stock market'
     ]
-    api_news_endpoint = "https://content.guardianapis.com/search"
-    section = 'Finance'
+    
+    
 
     
 

@@ -12,6 +12,7 @@ API app to extract crypto data from Binance.
   <li>keywords</li>
 </ui>
 
+<br>
 
 2- Transformation.DataCleaner class contains method to clean the extracted Binance data and saves the cleaned data in the binance_data.csv.
 <ul>
